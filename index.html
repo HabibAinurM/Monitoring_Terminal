@@ -839,9 +839,18 @@ document.getElementById('export-pdf').addEventListener('click', () => {
 
   // table
   const head = [['Tanggal', 'Jam', 'PO / Operator', 'Rute', 'Plat', 'Penumpang']];
-  const body = data.map(e => [
-    e.tanggal, e.jam, e.po, `${e.asal} → ${e.tujuan}`, e.plat || '–', String(e.jumlah)
-  ]);
+  const body = data.map(e => {
+    let tgl = e.tanggal || '';
+    if (typeof tgl === 'string' && tgl.includes('T')) tgl = tgl.split('T')[0];
+    let jm = e.jam || '';
+    if (typeof jm === 'string' && jm.includes('T')) {
+      const d = new Date(jm);
+      jm = String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0');
+    }
+    return [
+      tgl, jm, e.po, `${e.asal} - ${e.tujuan}`, e.plat || '–', String(e.jumlah)
+    ];
+  });
   body.push(['', '', '', '', 'TOTAL', String(totalPenumpang)]);
 
   doc.autoTable({
