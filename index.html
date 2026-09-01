@@ -508,8 +508,8 @@
   <div class="board-inner">
     <div>
       <span class="brand-mark">SIMONA · TERMINAL</span>
-      <h1>Papan Kedatangan Bus</h1>
-      <p class="subtitle">Data penumpang dihimpun dari laporan crew bus setiap kedatangan, dicatat petugas, dan ditampilkan agar mudah dipantau siapa saja.</p>
+      <h1>Papan Data Armada Bus</h1>
+      <p class="subtitle">Data penumpang dihimpun dari laporan crew bus, dicatat petugas, dan ditampilkan agar mudah dipantau siapa saja.</p>
     </div>
     <div class="flap-col">
       <div class="flap-clock">
@@ -538,8 +538,8 @@
         <div class="ticket-perf"></div>
         <div class="ticket-head">
           <div>
-            <h2>Catat kedatangan bus</h2>
-            <p class="hint">Isi berdasarkan informasi yang disampaikan crew bus saat masuk terminal.</p>
+            <h2>Catat data armada bus</h2>
+            <p class="hint">Isi berdasarkan informasi yang disampaikan crew bus saat di terminal.</p>
           </div>
           <span class="ticket-tag">MANIFES</span>
         </div>
@@ -547,7 +547,23 @@
         <form id="entry-form" class="form-body">
           <div class="row2">
             <div class="field">
-              <label for="f-jam">Jam kedatangan</label>
+              <label for="f-jenis">Jenis pencatatan</label>
+              <select id="f-jenis" required style="width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:6px; background:var(--paper-card); font-family:'Work Sans',sans-serif; font-size:14px; color:var(--text);">
+                <option value="Kedatangan">Kedatangan</option>
+                <option value="Keberangkatan">Keberangkatan</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="f-trayek">Jenis trayek</label>
+              <select id="f-trayek" required style="width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:6px; background:var(--paper-card); font-family:'Work Sans',sans-serif; font-size:14px; color:var(--text);">
+                <option value="AKAP">AKAP</option>
+                <option value="AKDP">AKDP</option>
+              </select>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="f-jam">Jam operasional</label>
               <input type="time" id="f-jam" required>
             </div>
             <div class="field">
@@ -637,12 +653,12 @@
     </div>
 
     <div class="panel">
-      <h3>Riwayat kedatangan</h3>
+      <h3>Riwayat pencatatan</h3>
       <div id="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Jam</th><th>PO</th><th>Rute</th><th>Plat</th><th style="text-align:right">Penumpang</th>
+              <th>Jam</th><th>PO</th><th>Jenis</th><th>Trayek</th><th>Rute</th><th>Plat</th><th style="text-align:right">Penumpang</th>
             </tr>
           </thead>
           <tbody id="history-body"></tbody>
@@ -741,9 +757,11 @@ document.getElementById('entry-form').addEventListener('submit', async (e) => {
   const po = document.getElementById('f-po').value.trim();
   const asal = document.getElementById('f-asal').value.trim();
   const tujuan = document.getElementById('f-tujuan').value.trim();
+  const jenis = document.getElementById('f-jenis').value;
+  const trayek = document.getElementById('f-trayek').value;
   const jumlah = parseInt(document.getElementById('f-jumlah').value, 10);
 
-  if (!jam || !po || !asal || !tujuan || isNaN(jumlah) || jumlah < 0) return;
+  if (!jam || !po || !asal || !tujuan || !jenis || !trayek || isNaN(jumlah) || jumlah < 0) return;
 
   const now = new Date();
   const entry = {
@@ -754,6 +772,8 @@ document.getElementById('entry-form').addEventListener('submit', async (e) => {
     po,
     asal,
     tujuan,
+    jenis,
+    trayek,
     jumlah,
     createdAt: now.toISOString()
   };
@@ -786,8 +806,8 @@ function renderRecent() {
   wrap.innerHTML = last.map(en => `
     <div class="stub">
       <div>
-        <div class="stub-route">${escapeHtml(en.po)}</div>
-        <div class="stub-meta">${escapeHtml(en.asal)} → ${escapeHtml(en.tujuan)} · ${en.jam}${en.plat ? ' · ' + escapeHtml(en.plat) : ''}</div>
+        <div class="stub-route">${escapeHtml(en.po)} <span style="font-weight:normal; font-size:12.5px; color:var(--text-soft)">(${escapeHtml(en.jenis || 'Kedatangan')} - ${escapeHtml(en.trayek || 'AKAP')})</span></div>
+        <div class="stub-meta">${escapeHtml(en.asal)} - ${escapeHtml(en.tujuan)} · ${en.jam}${en.plat ? ' · ' + escapeHtml(en.plat) : ''}</div>
       </div>
       <div class="stub-count">${en.jumlah}<span>pnp</span></div>
     </div>
@@ -838,7 +858,7 @@ document.getElementById('export-pdf').addEventListener('click', () => {
   doc.text(`Total penumpang: ${totalPenumpang.toLocaleString('id-ID')}      Jumlah bus: ${totalBus}      Rata-rata/bus: ${Math.round(totalPenumpang/totalBus)}`, 40, 96);
 
   // table
-  const head = [['Tanggal', 'Jam', 'PO / Operator', 'Rute', 'Plat', 'Penumpang']];
+  const head = [['Tanggal', 'Jam', 'PO', 'Jenis', 'Trayek', 'Rute', 'Plat', 'Penumpang']];
   const body = data.map(e => {
     let tgl = e.tanggal || '';
     if (typeof tgl === 'string' && tgl.includes('T')) tgl = tgl.split('T')[0];
@@ -848,10 +868,10 @@ document.getElementById('export-pdf').addEventListener('click', () => {
       jm = String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0');
     }
     return [
-      tgl, jm, e.po, `${e.asal} - ${e.tujuan}`, e.plat || '–', String(e.jumlah)
+      tgl, jm, e.po, e.jenis || 'Kedatangan', e.trayek || 'AKAP', `${e.asal} - ${e.tujuan}`, e.plat || '–', String(e.jumlah)
     ];
   });
-  body.push(['', '', '', '', 'TOTAL', String(totalPenumpang)]);
+  body.push(['', '', '', '', '', '', 'TOTAL', String(totalPenumpang)]);
 
   doc.autoTable({
     head,
@@ -860,7 +880,7 @@ document.getElementById('export-pdf').addEventListener('click', () => {
     styles: { font: 'helvetica', fontSize: 9, cellPadding: 6, textColor: '#23262c' },
     headStyles: { fillColor: [23, 26, 31], textColor: [239, 231, 214], fontStyle: 'bold' },
     alternateRowStyles: { fillColor: [251, 247, 238] },
-    columnStyles: { 5: { halign: 'right', fontStyle: 'bold', textColor: [187, 75, 40] } },
+    columnStyles: { 7: { halign: 'right', fontStyle: 'bold', textColor: [187, 75, 40] } },
     didParseCell: (hookData) => {
       if (hookData.row.index === body.length - 1 && hookData.section === 'body') {
         hookData.cell.styles.fontStyle = 'bold';
@@ -929,7 +949,9 @@ function renderDashboard() {
       <tr>
         <td>${e.jam}</td>
         <td>${escapeHtml(e.po)}</td>
-        <td>${escapeHtml(e.asal)} → ${escapeHtml(e.tujuan)}</td>
+        <td>${escapeHtml(e.jenis || 'Kedatangan')}</td>
+        <td>${escapeHtml(e.trayek || 'AKAP')}</td>
+        <td>${escapeHtml(e.asal)} - ${escapeHtml(e.tujuan)}</td>
         <td>${e.plat ? escapeHtml(e.plat) : '–'}</td>
         <td class="tnum">${e.jumlah}</td>
       </tr>
