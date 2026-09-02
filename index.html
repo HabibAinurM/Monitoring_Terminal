@@ -47,12 +47,11 @@
 
   /* ================= HEADER / GATE BOARD ================= */
   .board {
-    background: var(--ink);
-    background-image:
-      linear-gradient(180deg, rgba(255,255,255,.03), transparent 40%);
-    color: var(--paper);
+    background: var(--paper-card);
+    color: var(--text);
     padding: 30px 26px 0;
     position: relative;
+    border-bottom: 1px solid var(--line);
   }
   .board-inner {
     max-width: 1080px;
@@ -69,8 +68,8 @@
     font-size: 12.5px;
     font-weight: 600;
     letter-spacing: .5px;
-    color: var(--ink);
-    background: var(--amber);
+    color: var(--paper-card);
+    background: var(--teal);
     padding: 3px 9px;
     border-radius: 3px;
     margin-bottom: 12px;
@@ -82,7 +81,7 @@
     letter-spacing: -.2px;
   }
   .subtitle {
-    color: #b7b0a0;
+    color: var(--text-soft);
     font-size: 14px;
     margin: 0;
     max-width: 460px;
@@ -96,7 +95,8 @@
     align-items: center;
   }
   .flap {
-    background: linear-gradient(180deg, #333944 0%, #262b33 100%);
+    background: var(--paper-card);
+    border: 1px solid var(--line);
     border-radius: 4px;
     width: 42px;
     height: 54px;
@@ -105,20 +105,20 @@
     justify-content: center;
     font-size: 28px;
     font-weight: 700;
-    color: var(--amber-soft);
+    color: var(--rust);
     position: relative;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+    box-shadow: 0 1px 2px rgba(0,0,0,.05);
   }
   .flap::after {
     content: "";
     position: absolute;
     left: 0; right: 0; top: 50%;
     height: 1px;
-    background: rgba(0,0,0,.4);
+    background: var(--line);
   }
-  .flap-sep { color: #6b7280; font-size: 24px; font-weight: 600; }
+  .flap-sep { color: var(--text-soft); font-size: 24px; font-weight: 600; }
   .flap-date {
-    color: #8b8474;
+    color: var(--text-soft);
     font-size: 12px;
     margin-top: 8px;
     text-align: right;
@@ -131,12 +131,12 @@
     margin: 0 auto;
     display: flex;
     gap: 2px;
-    border-top: 1px solid var(--line-dark);
+    border-top: 1px solid var(--line);
   }
   .tab-btn {
     background: none;
     border: none;
-    color: #8b8474;
+    color: var(--text-soft);
     padding: 15px 22px;
     font-size: 14px;
     font-weight: 600;
@@ -145,15 +145,15 @@
     position: relative;
     transition: color .15s ease;
   }
-  .tab-btn.active { color: var(--amber-soft); }
+  .tab-btn.active { color: var(--rust); }
   .tab-btn.active::after {
     content: "";
     position: absolute;
     left: 22px; right: 22px; bottom: 0;
     height: 2px;
-    background: var(--amber);
+    background: var(--rust);
   }
-  .tab-btn:hover:not(.active) { color: #cfc7b4; }
+  .tab-btn:hover:not(.active) { color: var(--text); }
   .tab-btn .gate-no {
     color: var(--rust);
     margin-right: 6px;
@@ -417,38 +417,35 @@
   @media (max-width: 780px) { .flap-stats { grid-template-columns: repeat(2, 1fr); } }
 
   .flap-panel {
-    background: var(--ink);
+    background: var(--paper-card);
+    border: 1px solid var(--line);
     border-radius: 9px;
     padding: 18px 18px 16px;
-    color: var(--paper);
+    color: var(--text);
     position: relative;
     overflow: hidden;
   }
   .flap-panel::before {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; top: 50%;
-    height: 1px;
-    background: rgba(0,0,0,.35);
+    display: none;
   }
   .flap-panel .fp-label {
     font-size: 11px;
     font-weight: 600;
     letter-spacing: .3px;
-    color: #9a927e;
+    color: var(--text-soft);
     margin-bottom: 10px;
   }
   .flap-panel .fp-value {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 30px;
     font-weight: 700;
-    color: var(--amber-soft);
+    color: var(--rust);
     line-height: 1;
   }
-  .flap-panel.teal .fp-value { color: #8fd3c4; }
+  .flap-panel.teal .fp-value { color: var(--teal); }
   .flap-panel .fp-sub {
     font-size: 11.5px;
-    color: #8b8474;
+    color: var(--text-soft);
     margin-top: 7px;
   }
 
