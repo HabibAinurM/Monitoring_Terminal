@@ -1,806 +1,1012 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIMONA — Papan Kedatangan Bus Terminal</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<style>
-  :root {
-    --ink: #171a1f;
-    --ink-2: #22262e;
-    --ink-3: #2c313b;
-    --paper: #efe7d6;
-    --paper-card: #fbf7ee;
-    --rust: #bb4b28;
-    --rust-dim: #e7bda9;
-    --rust-wash: #f4e3da;
-    --teal: #1f6f64;
-    --teal-dim: #bcd9d2;
-    --amber: #d9a441;
-    --amber-soft: #f1d49c;
-    --text: #23262c;
-    --text-soft: #736b5c;
-    --line: #ddd2b8;
-    --line-dark: #3a3f49;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMONA — Papan Kedatangan Bus Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    :root {
+      --ink: #171a1f;
+      --ink-2: #22262e;
+      --ink-3: #2c313b;
+      --paper: #efe7d6;
+      --paper-card: #fbf7ee;
+      --rust: #bb4b28;
+      --rust-dim: #e7bda9;
+      --rust-wash: #f4e3da;
+      --teal: #1f6f64;
+      --teal-dim: #bcd9d2;
+      --amber: #d9a441;
+      --amber-soft: #f1d49c;
+      --text: #23262c;
+      --text-soft: #736b5c;
+      --line: #ddd2b8;
+      --line-dark: #3a3f49;
+    }
 
-  * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--text);
-    font-family: 'Work Sans', sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--text);
+      font-family: 'Work Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
 
-  h1, h2, h3, .flap-num, .num, .brand-mark, .tab-btn, th {
-    font-family: 'Space Grotesk', sans-serif;
-  }
+    h1,
+    h2,
+    h3,
+    .flap-num,
+    .num,
+    .brand-mark,
+    .tab-btn,
+    th {
+      font-family: 'Space Grotesk', sans-serif;
+    }
 
-  .num { font-variant-numeric: tabular-nums; }
+    .num {
+      font-variant-numeric: tabular-nums;
+    }
 
-  /* ================= HEADER / GATE BOARD ================= */
-  .board {
-    background: var(--paper-card);
-    color: var(--text);
-    padding: 30px 26px 0;
-    position: relative;
-    border-bottom: 1px solid var(--line);
-  }
-  .board-inner {
-    max-width: 1080px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    gap: 22px;
-    padding-bottom: 24px;
-  }
-  .brand-mark {
-    display: inline-block;
-    font-size: 12.5px;
-    font-weight: 600;
-    letter-spacing: .5px;
-    color: var(--paper-card);
-    background: var(--teal);
-    padding: 3px 9px;
-    border-radius: 3px;
-    margin-bottom: 12px;
-  }
-  h1 {
-    font-size: 27px;
-    font-weight: 600;
-    margin: 0 0 8px;
-    letter-spacing: -.2px;
-  }
-  .subtitle {
-    color: var(--text-soft);
-    font-size: 14px;
-    margin: 0;
-    max-width: 460px;
-    line-height: 1.55;
-  }
+    /* ================= HEADER / GATE BOARD ================= */
+    .board {
+      background: var(--paper-card);
+      color: var(--text);
+      padding: 30px 26px 0;
+      position: relative;
+      border-bottom: 1px solid var(--line);
+    }
 
-  /* the split-flap clock, the one signature moment */
-  .flap-clock {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-  }
-  .flap {
-    background: var(--paper-card);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    width: 42px;
-    height: 54px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--rust);
-    position: relative;
-    box-shadow: 0 1px 2px rgba(0,0,0,.05);
-  }
-  .flap::after {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; top: 50%;
-    height: 1px;
-    background: var(--line);
-  }
-  .flap-sep { color: var(--text-soft); font-size: 24px; font-weight: 600; }
-  .flap-date {
-    color: var(--text-soft);
-    font-size: 12px;
-    margin-top: 8px;
-    text-align: right;
-  }
-  .flap-col { display: flex; flex-direction: column; align-items: flex-end; }
+    .board-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 22px;
+      padding-bottom: 24px;
+    }
 
-  /* gate-style tabs */
-  .tabs {
-    max-width: 1080px;
-    margin: 0 auto;
-    display: flex;
-    gap: 2px;
-    border-top: 1px solid var(--line);
-  }
-  .tab-btn {
-    background: none;
-    border: none;
-    color: var(--text-soft);
-    padding: 15px 22px;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: .2px;
-    cursor: pointer;
-    position: relative;
-    transition: color .15s ease;
-  }
-  .tab-btn.active { color: var(--rust); }
-  .tab-btn.active::after {
-    content: "";
-    position: absolute;
-    left: 22px; right: 22px; bottom: 0;
-    height: 2px;
-    background: var(--rust);
-  }
-  .tab-btn:hover:not(.active) { color: var(--text); }
-  .tab-btn .gate-no {
-    color: var(--rust);
-    margin-right: 6px;
-  }
+    .brand-mark {
+      display: inline-block;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: .5px;
+      color: var(--paper-card);
+      background: var(--teal);
+      padding: 3px 9px;
+      border-radius: 3px;
+      margin-bottom: 12px;
+    }
 
-  main {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 32px 26px 70px;
-  }
+    h1 {
+      font-size: 27px;
+      font-weight: 600;
+      margin: 0 0 8px;
+      letter-spacing: -.2px;
+    }
 
-  .view { display: none; }
-  .view.active { display: block; animation: fadein .35s ease; }
-  @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .subtitle {
+      color: var(--text-soft);
+      font-size: 14px;
+      margin: 0;
+      max-width: 460px;
+      line-height: 1.55;
+    }
 
-  /* ================= INPUT VIEW ================= */
-  .input-grid {
-    display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap: 22px;
-    align-items: start;
-  }
-  @media (max-width: 780px) { .input-grid { grid-template-columns: 1fr; } }
+    /* the split-flap clock, the one signature moment */
+    .flap-clock {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
 
-  /* manifest ticket card */
-  .ticket {
-    background: var(--paper-card);
-    border-radius: 10px;
-    position: relative;
-    padding: 30px 30px 26px;
-    box-shadow: 0 1px 0 var(--line);
-    border: 1px solid var(--line);
-  }
-  .ticket::before, .ticket::after {
-    content: "";
-    position: absolute;
-    top: 96px;
-    width: 20px; height: 20px;
-    background: var(--paper);
-    border-radius: 50%;
-    border: 1px solid var(--line);
-  }
-  .ticket::before { left: -11px; }
-  .ticket::after { right: -11px; }
-  .ticket-perf {
-    position: absolute;
-    left: 6px; right: 6px; top: 96px;
-    border-top: 2px dashed var(--line);
-  }
+    .flap {
+      background: var(--paper-card);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      width: 42px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--rust);
+      position: relative;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    }
 
-  .ticket-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
-  }
-  .ticket-head h2 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 5px;
-  }
-  .ticket-head .hint {
-    color: var(--text-soft);
-    font-size: 13.5px;
-    max-width: 320px;
-    line-height: 1.5;
-    margin: 0;
-  }
-  .ticket-tag {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--teal);
-    border: 1px solid var(--teal-dim);
-    background: #eef5f3;
-    padding: 4px 9px;
-    border-radius: 4px;
-    white-space: nowrap;
-  }
+    .flap::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: var(--line);
+    }
 
-  .form-body { padding-top: 34px; }
-  .field { margin-bottom: 16px; }
-  .field label {
-    display: block;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--text-soft);
-    margin-bottom: 6px;
-  }
-  .field input {
-    width: 100%;
-    font-family: 'Work Sans', sans-serif;
-    font-size: 15px;
-    padding: 10px 13px;
-    border: 1.5px solid var(--line);
-    border-radius: 6px;
-    background: #fff;
-    color: var(--text);
-    transition: border-color .15s ease;
-  }
-  .field input:focus {
-    outline: none;
-    border-color: var(--rust);
-  }
-  .field input:focus-visible { outline: 2px solid var(--rust); outline-offset: 1px; }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
+    .flap-sep {
+      color: var(--text-soft);
+      font-size: 24px;
+      font-weight: 600;
+    }
 
-  .btn-primary {
-    font-family: 'Space Grotesk', sans-serif;
-    background: var(--rust);
-    color: #fff;
-    border: none;
-    padding: 13px 22px;
-    font-size: 14.5px;
-    font-weight: 600;
-    letter-spacing: .2px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background .15s ease, transform .05s ease;
-    width: 100%;
-    margin-top: 6px;
-  }
-  .btn-primary:hover { background: #a3401f; }
-  .btn-primary:active { transform: translateY(1px); }
-  .btn-primary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .flap-date {
+      color: var(--text-soft);
+      font-size: 12px;
+      margin-top: 8px;
+      text-align: right;
+    }
 
-  .toast {
-    margin-top: 13px;
-    padding: 10px 14px;
-    border-radius: 6px;
-    font-size: 13.5px;
-    font-weight: 500;
-    background: #e9f3ef;
-    color: var(--teal);
-    border: 1px solid var(--teal-dim);
-    display: none;
-  }
-  .toast.show { display: block; }
+    .flap-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
 
-  /* recent stubs */
-  .stub-panel h3 {
-    font-size: 12.5px;
-    font-weight: 600;
-    letter-spacing: .3px;
-    color: var(--text-soft);
-    margin: 4px 0 14px;
-  }
-  .stub {
-    background: var(--paper-card);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-  }
-  .stub-route {
-    font-weight: 600;
-    font-size: 14.5px;
-  }
-  .stub-meta {
-    color: var(--text-soft);
-    font-size: 12.5px;
-    margin-top: 3px;
-  }
-  .stub-count {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--rust);
-    flex-shrink: 0;
-  }
-  .stub-count span {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-soft);
-    display: block;
-    text-align: right;
-  }
-  .stub-empty {
-    color: var(--text-soft);
-    font-size: 14px;
-    padding: 20px 0;
-  }
+    /* gate-style tabs */
+    .tabs {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      gap: 2px;
+      border-top: 1px solid var(--line);
+    }
 
-  /* ================= DASHBOARD VIEW ================= */
-  .filter-row {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-  .filter-row label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-soft);
-  }
-  .filter-row input[type=date] {
-    font-family: 'Work Sans', sans-serif;
-    padding: 8px 11px;
-    border: 1.5px solid var(--line);
-    border-radius: 6px;
-    font-size: 14px;
-    background: var(--paper-card);
-  }
-  .filter-row input[type=date]:focus { outline: none; border-color: var(--rust); }
-  .reset-link {
-    font-size: 13px;
-    color: var(--teal);
-    font-weight: 500;
-    text-decoration: underline;
-    cursor: pointer;
-    background: none;
-    border: none;
-    font-family: 'Work Sans', sans-serif;
-  }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-soft);
+      padding: 15px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: .2px;
+      cursor: pointer;
+      position: relative;
+      transition: color .15s ease;
+    }
 
-  .export-group {
-    margin-left: auto;
-    display: flex;
-    gap: 8px;
-  }
-  .btn-export {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: .1px;
-    background: var(--rust);
-    color: #fff;
-    border: none;
-    padding: 9px 15px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background .15s ease, transform .05s ease;
-  }
-  .btn-export:hover { background: #a3401f; }
-  .btn-export:active { transform: translateY(1px); }
-  .btn-export.outline {
-    background: transparent;
-    color: var(--ink);
-    border: 1.5px solid var(--line);
-  }
-  .btn-export.outline:hover { background: var(--paper-card); border-color: var(--rust); }
-  .btn-export:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .tab-btn.active {
+      color: var(--rust);
+    }
 
-  @media (max-width: 560px) {
-    .export-group { margin-left: 0; width: 100%; }
-    .btn-export { flex: 1; }
-  }
+    .tab-btn.active::after {
+      content: "";
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 0;
+      height: 2px;
+      background: var(--rust);
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text);
+    }
+
+    .tab-btn .gate-no {
+      color: var(--rust);
+      margin-right: 6px;
+    }
+
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 32px 26px 70px;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+      animation: fadein .35s ease;
+    }
+
+    @keyframes fadein {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ================= INPUT VIEW ================= */
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    @media (max-width: 780px) {
+      .input-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* manifest ticket card */
+    .ticket {
+      background: var(--paper-card);
+      border-radius: 10px;
+      position: relative;
+      padding: 30px 30px 26px;
+      box-shadow: 0 1px 0 var(--line);
+      border: 1px solid var(--line);
+    }
+
+    .ticket::before,
+    .ticket::after {
+      content: "";
+      position: absolute;
+      top: 96px;
+      width: 20px;
+      height: 20px;
+      background: var(--paper);
+      border-radius: 50%;
+      border: 1px solid var(--line);
+    }
+
+    .ticket::before {
+      left: -11px;
+    }
+
+    .ticket::after {
+      right: -11px;
+    }
+
+    .ticket-perf {
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      top: 96px;
+      border-top: 2px dashed var(--line);
+    }
+
+    .ticket-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .ticket-head h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 5px;
+    }
+
+    .ticket-head .hint {
+      color: var(--text-soft);
+      font-size: 13.5px;
+      max-width: 320px;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .ticket-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--teal);
+      border: 1px solid var(--teal-dim);
+      background: #eef5f3;
+      padding: 4px 9px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .form-body {
+      padding-top: 34px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-soft);
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 15px;
+      padding: 10px 13px;
+      border: 1.5px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      transition: border-color .15s ease;
+    }
+
+    .field input:focus {
+      outline: none;
+      border-color: var(--rust);
+    }
+
+    .field input:focus-visible {
+      outline: 2px solid var(--rust);
+      outline-offset: 1px;
+    }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .row2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn-primary {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--rust);
+      color: #fff;
+      border: none;
+      padding: 13px 22px;
+      font-size: 14.5px;
+      font-weight: 600;
+      letter-spacing: .2px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background .15s ease, transform .05s ease;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    .btn-primary:hover {
+      background: #a3401f;
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+
+    .toast {
+      margin-top: 13px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 500;
+      background: #e9f3ef;
+      color: var(--teal);
+      border: 1px solid var(--teal-dim);
+      display: none;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    /* recent stubs */
+    .stub-panel h3 {
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: .3px;
+      color: var(--text-soft);
+      margin: 4px 0 14px;
+    }
+
+    .stub {
+      background: var(--paper-card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stub-route {
+      font-weight: 600;
+      font-size: 14.5px;
+    }
+
+    .stub-meta {
+      color: var(--text-soft);
+      font-size: 12.5px;
+      margin-top: 3px;
+    }
+
+    .stub-count {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--rust);
+      flex-shrink: 0;
+    }
+
+    .stub-count span {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-soft);
+      display: block;
+      text-align: right;
+    }
+
+    .stub-empty {
+      color: var(--text-soft);
+      font-size: 14px;
+      padding: 20px 0;
+    }
+
+    /* ================= DASHBOARD VIEW ================= */
+    .filter-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-row label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-soft);
+    }
+
+    .filter-row input[type=date] {
+      font-family: 'Work Sans', sans-serif;
+      padding: 8px 11px;
+      border: 1.5px solid var(--line);
+      border-radius: 6px;
+      font-size: 14px;
+      background: var(--paper-card);
+    }
+
+    .filter-row input[type=date]:focus {
+      outline: none;
+      border-color: var(--rust);
+    }
+
+    .reset-link {
+      font-size: 13px;
+      color: var(--teal);
+      font-weight: 500;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'Work Sans', sans-serif;
+    }
+
+    .export-group {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-export {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .1px;
+      background: var(--rust);
+      color: #fff;
+      border: none;
+      padding: 9px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background .15s ease, transform .05s ease;
+    }
+
+    .btn-export:hover {
+      background: #a3401f;
+    }
+
+    .btn-export:active {
+      transform: translateY(1px);
+    }
+
+    .btn-export.outline {
+      background: transparent;
+      color: var(--ink);
+      border: 1.5px solid var(--line);
+    }
+
+    .btn-export.outline:hover {
+      background: var(--paper-card);
+      border-color: var(--rust);
+    }
+
+    .btn-export:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 560px) {
+      .export-group {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .btn-export {
+        flex: 1;
+      }
+    }
 
 
-  .flap-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 22px;
-  }
-  @media (max-width: 780px) { .flap-stats { grid-template-columns: repeat(2, 1fr); } }
+    .flap-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
 
-  .flap-panel {
-    background: var(--paper-card);
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    padding: 18px 18px 16px;
-    color: var(--text);
-    position: relative;
-    overflow: hidden;
-  }
-  .flap-panel::before {
-    display: none;
-  }
-  .flap-panel .fp-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .3px;
-    color: var(--text-soft);
-    margin-bottom: 10px;
-  }
-  .flap-panel .fp-value {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 30px;
-    font-weight: 700;
-    color: var(--rust);
-    line-height: 1;
-  }
-  .flap-panel.teal .fp-value { color: var(--teal); }
-  .flap-panel .fp-sub {
-    font-size: 11.5px;
-    color: var(--text-soft);
-    margin-top: 7px;
-  }
+    @media (max-width: 780px) {
+      .flap-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
 
-  .chart-row {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 16px;
-    margin-bottom: 18px;
-  }
-  @media (max-width: 780px) { .chart-row { grid-template-columns: 1fr; } }
+    .flap-panel {
+      background: var(--paper-card);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 18px 18px 16px;
+      color: var(--text);
+      position: relative;
+      overflow: hidden;
+    }
 
-  .panel {
-    background: var(--paper-card);
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    padding: 20px 20px 16px;
-  }
-  .panel h3 {
-    margin: 0 0 14px;
-    font-size: 14.5px;
-    font-weight: 600;
-  }
-  .panel-height { height: 230px; }
+    .flap-panel::before {
+      display: none;
+    }
 
-  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-  th, td {
-    text-align: left;
-    padding: 10px 8px;
-    border-bottom: 1px solid var(--line);
-  }
-  th {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .3px;
-    color: var(--text-soft);
-  }
-  td.tnum { font-family: 'Space Grotesk', sans-serif; font-weight: 600; text-align: right; color: var(--rust); }
-  tbody tr:hover { background: var(--rust-wash); }
-  tbody tr:last-child td { border-bottom: none; }
+    .flap-panel .fp-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .3px;
+      color: var(--text-soft);
+      margin-bottom: 10px;
+    }
 
-  .empty-state {
-    text-align: center;
-    padding: 44px 20px;
-    color: var(--text-soft);
-    font-size: 14px;
-  }
+    .flap-panel .fp-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--rust);
+      line-height: 1;
+    }
 
-  ::selection { background: var(--amber-soft); }
-</style>
+    .flap-panel.teal .fp-value {
+      color: var(--teal);
+    }
+
+    .flap-panel .fp-sub {
+      font-size: 11.5px;
+      color: var(--text-soft);
+      margin-top: 7px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 780px) {
+      .chart-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--paper-card);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 20px 20px 16px;
+    }
+
+    .panel h3 {
+      margin: 0 0 14px;
+      font-size: 14.5px;
+      font-weight: 600;
+    }
+
+    .panel-height {
+      height: 230px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .3px;
+      color: var(--text-soft);
+    }
+
+    td.tnum {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      text-align: right;
+      color: var(--rust);
+    }
+
+    tbody tr:hover {
+      background: var(--rust-wash);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 44px 20px;
+      color: var(--text-soft);
+      font-size: 14px;
+    }
+
+    ::selection {
+      background: var(--amber-soft);
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="board">
-  <div id="api-warning" style="display:none; background:#7a2b16; color:#f4e3da; font-size:13px; text-align:center; padding:8px 16px;">
-    URL Apps Script belum diisi — sistem sedang memakai penyimpanan browser sementara (localStorage). Buka file, isi <code>API_URL</code> dengan URL Web App Apps Script kamu.
-  </div>
-  <div class="board-inner">
-    <div>
-      <span class="brand-mark">SISTEM INFORMASI TERMINAL</span>
-      <h1>Sistem Pencatatan Armada Bus</h1>
-      <p class="subtitle">Pantau data pergerakan armada dan manifes penumpang secara real-time untuk efisiensi operasional terminal.</p>
+  <div class="board">
+    <div id="api-warning"
+      style="display:none; background:#7a2b16; color:#f4e3da; font-size:13px; text-align:center; padding:8px 16px;">
+      URL Apps Script belum diisi — sistem sedang memakai penyimpanan browser sementara (localStorage). Buka file, isi
+      <code>API_URL</code> dengan URL Web App Apps Script kamu.
     </div>
-    <div class="flap-col">
-      <div class="flap-clock">
-        <div class="flap" id="h1">0</div>
-        <div class="flap" id="h2">0</div>
-        <span class="flap-sep">:</span>
-        <div class="flap" id="m1">0</div>
-        <div class="flap" id="m2">0</div>
+    <div class="board-inner">
+      <div>
+        <span class="brand-mark">SISTEM INFORMASI TERMINAL</span>
+        <h1>Sistem Pencatatan Armada Bus</h1>
+        <p class="subtitle">Pantau data pergerakan armada dan manifes penumpang secara real-time untuk efisiensi
+          operasional terminal.</p>
       </div>
-      <div class="flap-date" id="today">—</div>
+      <div class="flap-col">
+        <div class="flap-clock">
+          <div class="flap" id="h1">0</div>
+          <div class="flap" id="h2">0</div>
+          <span class="flap-sep">:</span>
+          <div class="flap" id="m1">0</div>
+          <div class="flap" id="m2">0</div>
+        </div>
+        <div class="flap-date" id="today">—</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="input"><span class="gate-no">01</span>Input Data</button>
+      <button class="tab-btn" data-tab="dashboard"><span class="gate-no">02</span>Dashboard</button>
     </div>
   </div>
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="input"><span class="gate-no">01</span>Input Data</button>
-    <button class="tab-btn" data-tab="dashboard"><span class="gate-no">02</span>Dashboard</button>
-  </div>
-</div>
 
-<main>
+  <main>
 
-  <!-- ===== INPUT VIEW ===== -->
-  <section class="view active" id="view-input">
-    <div class="input-grid">
+    <!-- ===== INPUT VIEW ===== -->
+    <section class="view active" id="view-input">
+      <div class="input-grid">
 
-      <div class="ticket">
-        <div class="ticket-perf"></div>
-        <div class="ticket-head">
-          <div>
-            <h2>Input Pergerakan Bus</h2>
-            <p class="hint">Masukkan data kedatangan atau keberangkatan sesuai informasi terkini dari kondektur/sopir.</p>
+        <div class="ticket">
+          <div class="ticket-perf"></div>
+          <div class="ticket-head">
+            <div>
+              <h2>Input Pergerakan Bus</h2>
+              <p class="hint">Masukkan data kedatangan atau keberangkatan sesuai informasi terkini dari kondektur/sopir.
+              </p>
+            </div>
+            <span class="ticket-tag">MANIFES</span>
           </div>
-          <span class="ticket-tag">MANIFES</span>
+
+          <form id="entry-form" class="form-body">
+            <div class="row2">
+              <div class="field">
+                <label for="f-jenis">Jenis pencatatan</label>
+                <select id="f-jenis" required
+                  style="width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:6px; background:var(--paper-card); font-family:'Work Sans',sans-serif; font-size:14px; color:var(--text);">
+                  <option value="Kedatangan">Kedatangan</option>
+                  <option value="Keberangkatan">Keberangkatan</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="f-trayek">Jenis trayek</label>
+                <select id="f-trayek" required
+                  style="width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:6px; background:var(--paper-card); font-family:'Work Sans',sans-serif; font-size:14px; color:var(--text);">
+                  <option value="AKAP">AKAP</option>
+                  <option value="AKDP">AKDP</option>
+                </select>
+              </div>
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label for="f-jam">Jam operasional</label>
+                <input type="time" id="f-jam" required>
+              </div>
+              <div class="field">
+                <label for="f-plat">Plat nomor (opsional)</label>
+                <input type="text" id="f-plat" placeholder="mis. AE 7231 CD">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="f-po">Nama PO / operator bus</label>
+              <input type="text" id="f-po" placeholder="mis. Sumber Kencono" required>
+            </div>
+
+            <div class="row2">
+              <div class="field">
+                <label for="f-asal">Rute asal</label>
+                <input type="text" id="f-asal" placeholder="mis. Surabaya" required>
+              </div>
+              <div class="field">
+                <label for="f-tujuan">Rute tujuan</label>
+                <input type="text" id="f-tujuan" placeholder="mis. Madiun" required>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="f-jumlah">Jumlah penumpang turun</label>
+              <input type="number" id="f-jumlah" min="0" placeholder="mis. 24" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Simpan data</button>
+            <div class="toast" id="toast">Data tersimpan.</div>
+          </form>
         </div>
 
-        <form id="entry-form" class="form-body">
-          <div class="row2">
-            <div class="field">
-              <label for="f-jenis">Jenis pencatatan</label>
-              <select id="f-jenis" required style="width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:6px; background:var(--paper-card); font-family:'Work Sans',sans-serif; font-size:14px; color:var(--text);">
-                <option value="Kedatangan">Kedatangan</option>
-                <option value="Keberangkatan">Keberangkatan</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="f-trayek">Jenis trayek</label>
-              <select id="f-trayek" required style="width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:6px; background:var(--paper-card); font-family:'Work Sans',sans-serif; font-size:14px; color:var(--text);">
-                <option value="AKAP">AKAP</option>
-                <option value="AKDP">AKDP</option>
-              </select>
-            </div>
-          </div>
-          <div class="row2">
-            <div class="field">
-              <label for="f-jam">Jam operasional</label>
-              <input type="time" id="f-jam" required>
-            </div>
-            <div class="field">
-              <label for="f-plat">Plat nomor (opsional)</label>
-              <input type="text" id="f-plat" placeholder="mis. AE 7231 CD">
-            </div>
-          </div>
+        <div class="stub-panel">
+          <h3>CATATAN TERBARU</h3>
+          <div id="recent-list"></div>
+        </div>
 
-          <div class="field">
-            <label for="f-po">Nama PO / operator bus</label>
-            <input type="text" id="f-po" placeholder="mis. Sumber Kencono" required>
-          </div>
+      </div>
+    </section>
 
-          <div class="row2">
-            <div class="field">
-              <label for="f-asal">Rute asal</label>
-              <input type="text" id="f-asal" placeholder="mis. Surabaya" required>
-            </div>
-            <div class="field">
-              <label for="f-tujuan">Rute tujuan</label>
-              <input type="text" id="f-tujuan" placeholder="mis. Madiun" required>
-            </div>
-          </div>
+    <!-- ===== DASHBOARD VIEW ===== -->
+    <section class="view" id="view-dashboard">
 
-          <div class="field">
-            <label for="f-jumlah">Jumlah penumpang turun</label>
-            <input type="number" id="f-jumlah" min="0" placeholder="mis. 24" required>
-          </div>
-
-          <button type="submit" class="btn-primary">Simpan data</button>
-          <div class="toast" id="toast">Data tersimpan.</div>
-        </form>
+      <div class="filter-row">
+        <label for="d-tanggal">Tampilkan tanggal:</label>
+        <input type="date" id="d-tanggal">
+        <button class="reset-link" id="d-reset">lihat semua data</button>
+        <div class="export-group">
+          <button class="btn-export" id="export-pdf">Unduh PDF</button>
+        </div>
       </div>
 
-      <div class="stub-panel">
-        <h3>CATATAN TERBARU</h3>
-        <div id="recent-list"></div>
+      <div class="flap-stats">
+        <div class="flap-panel">
+          <div class="fp-label">TOTAL PENUMPANG</div>
+          <div class="fp-value num" id="s-total">0</div>
+          <div class="fp-sub" id="s-total-sub">belum ada data</div>
+        </div>
+        <div class="flap-panel">
+          <div class="fp-label">BUS MASUK</div>
+          <div class="fp-value num" id="s-bus">0</div>
+          <div class="fp-sub" id="s-bus-sub">&nbsp;</div>
+        </div>
+        <div class="flap-panel teal">
+          <div class="fp-label">RATA-RATA / BUS</div>
+          <div class="fp-value num" id="s-avg">0</div>
+          <div class="fp-sub">penumpang per kedatangan</div>
+        </div>
+        <div class="flap-panel teal">
+          <div class="fp-label">JAM TERSIBUK</div>
+          <div class="fp-value num" id="s-peak">–</div>
+          <div class="fp-sub" id="s-peak-sub">&nbsp;</div>
+        </div>
       </div>
 
-    </div>
-  </section>
+      <div class="chart-row">
+        <div class="panel">
+          <h3>Penumpang per jam</h3>
+          <div class="panel-height"><canvas id="chart-hourly"></canvas></div>
+        </div>
+        <div class="panel">
+          <h3>Per operator (PO)</h3>
+          <div class="panel-height"><canvas id="chart-po"></canvas></div>
+        </div>
+      </div>
 
-  <!-- ===== DASHBOARD VIEW ===== -->
-  <section class="view" id="view-dashboard">
-
-    <div class="filter-row">
-      <label for="d-tanggal">Tampilkan tanggal:</label>
-      <input type="date" id="d-tanggal">
-      <button class="reset-link" id="d-reset">lihat semua data</button>
-      <div class="export-group">
-        <button class="btn-export" id="export-pdf">Unduh PDF</button>
-      </div>
-    </div>
-
-    <div class="flap-stats">
-      <div class="flap-panel">
-        <div class="fp-label">TOTAL PENUMPANG</div>
-        <div class="fp-value num" id="s-total">0</div>
-        <div class="fp-sub" id="s-total-sub">belum ada data</div>
-      </div>
-      <div class="flap-panel">
-        <div class="fp-label">BUS MASUK</div>
-        <div class="fp-value num" id="s-bus">0</div>
-        <div class="fp-sub" id="s-bus-sub">&nbsp;</div>
-      </div>
-      <div class="flap-panel teal">
-        <div class="fp-label">RATA-RATA / BUS</div>
-        <div class="fp-value num" id="s-avg">0</div>
-        <div class="fp-sub">penumpang per kedatangan</div>
-      </div>
-      <div class="flap-panel teal">
-        <div class="fp-label">JAM TERSIBUK</div>
-        <div class="fp-value num" id="s-peak">–</div>
-        <div class="fp-sub" id="s-peak-sub">&nbsp;</div>
-      </div>
-    </div>
-
-    <div class="chart-row">
       <div class="panel">
-        <h3>Penumpang per jam</h3>
-        <div class="panel-height"><canvas id="chart-hourly"></canvas></div>
+        <h3>Riwayat pencatatan</h3>
+        <div id="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Jam</th>
+                <th>PO</th>
+                <th>Jenis</th>
+                <th>Trayek</th>
+                <th>Rute</th>
+                <th>Plat</th>
+                <th style="text-align:right">Penumpang</th>
+              </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="empty-state" style="display:none;">Belum ada data untuk tanggal ini.</div>
       </div>
-      <div class="panel">
-        <h3>Per operator (PO)</h3>
-        <div class="panel-height"><canvas id="chart-po"></canvas></div>
-      </div>
-    </div>
 
-    <div class="panel">
-      <h3>Riwayat pencatatan</h3>
-      <div id="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Jam</th><th>PO</th><th>Jenis</th><th>Trayek</th><th>Rute</th><th>Plat</th><th style="text-align:right">Penumpang</th>
-            </tr>
-          </thead>
-          <tbody id="history-body"></tbody>
-        </table>
-      </div>
-      <div class="empty-state" id="empty-state" style="display:none;">Belum ada data untuk tanggal ini.</div>
-    </div>
+    </section>
 
-  </section>
+  </main>
 
-</main>
+  <script>
+    const STORAGE_KEY = 'simona-bus-entries'; // fallback lokal jika API belum diisi
 
-<script>
-const STORAGE_KEY = 'simona-bus-entries'; // fallback lokal jika API belum diisi
+    // ⬇⬇⬇ TEMPEL URL WEB APP APPS SCRIPT KAMU DI SINI (diakhiri /exec) ⬇⬇⬇
+    const API_URL = 'https://script.google.com/macros/s/AKfycby49_c0ge-VPXS_IEsRvP97DfLnJjOWJgovEkzxBa9RxuazynfMTdpaKVoDKL6m9mpn-g/exec';
 
-// ⬇⬇⬇ TEMPEL URL WEB APP APPS SCRIPT KAMU DI SINI (diakhiri /exec) ⬇⬇⬇
-const API_URL = 'https://script.google.com/macros/s/AKfycbxH68hL0PXqGuy6XyVk-H57LBc4HCYza2Yqhi6FlWRXTq3eTysKwLql9zDdgNfL2OeURg/exec';
+    let entries = [];
+    let hourlyChart, poChart;
+    const usingApi = API_URL && !API_URL.startsWith('PASTE_');
 
-let entries = [];
-let hourlyChart, poChart;
-const usingApi = API_URL && !API_URL.startsWith('PASTE_');
-
-// ---------- flap clock ----------
-function tickClock() {
-  const now = new Date();
-  const hh = String(now.getHours()).padStart(2, '0');
-  const mm = String(now.getMinutes()).padStart(2, '0');
-  document.getElementById('h1').textContent = hh[0];
-  document.getElementById('h2').textContent = hh[1];
-  document.getElementById('m1').textContent = mm[0];
-  document.getElementById('m2').textContent = mm[1];
-  document.getElementById('today').textContent = now.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-}
-tickClock();
-setInterval(tickClock, 1000 * 15);
-
-// ---------- tabs ----------
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('view-' + btn.dataset.tab).classList.add('active');
-    if (btn.dataset.tab === 'dashboard') renderDashboard();
-  });
-});
-
-// ---------- storage: Apps Script API, dengan fallback localStorage kalau URL belum diisi ----------
-async function loadEntries() {
-  if (usingApi) {
-    try {
-      const res = await fetch(API_URL, { method: 'GET' });
-      entries = await res.json();
-    } catch (e) {
-      console.error('Gagal mengambil data dari Apps Script', e);
-      entries = [];
-      showApiWarning();
+    // ---------- flap clock ----------
+    function tickClock() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('h1').textContent = hh[0];
+      document.getElementById('h2').textContent = hh[1];
+      document.getElementById('m1').textContent = mm[0];
+      document.getElementById('m2').textContent = mm[1];
+      document.getElementById('today').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     }
-  } else {
-    showApiWarning();
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      entries = raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      entries = [];
-    }
-  }
-  renderRecent();
-  renderDashboard();
-}
+    tickClock();
+    setInterval(tickClock, 1000 * 15);
 
-async function persistEntry(entry) {
-  if (usingApi) {
-    await fetch(API_URL, {
-      method: 'POST',
-      // Content-Type text/plain sengaja dipakai supaya browser tidak mengirim
-      // preflight OPTIONS, karena Apps Script Web App tidak menanganinya.
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(entry)
+    // ---------- tabs ----------
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('view-' + btn.dataset.tab).classList.add('active');
+        if (btn.dataset.tab === 'dashboard') renderDashboard();
+      });
     });
-  } else {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  }
-}
 
-function showApiWarning() {
-  const banner = document.getElementById('api-warning');
-  if (banner) banner.style.display = 'block';
-}
+    // ---------- storage: Apps Script API, dengan fallback localStorage kalau URL belum diisi ----------
+    async function loadEntries() {
+      if (usingApi) {
+        try {
+          const res = await fetch(API_URL, { method: 'GET' });
+          entries = await res.json();
+        } catch (e) {
+          console.error('Gagal mengambil data dari Apps Script', e);
+          entries = [];
+          showApiWarning();
+        }
+      } else {
+        showApiWarning();
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          entries = raw ? JSON.parse(raw) : [];
+        } catch (e) {
+          entries = [];
+        }
+      }
+      renderRecent();
+      renderDashboard();
+    }
 
-// ---------- form submit ----------
-document.getElementById('entry-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const jam = document.getElementById('f-jam').value;
-  const plat = document.getElementById('f-plat').value.trim();
-  const po = document.getElementById('f-po').value.trim();
-  const asal = document.getElementById('f-asal').value.trim();
-  const tujuan = document.getElementById('f-tujuan').value.trim();
-  const jenis = document.getElementById('f-jenis').value;
-  const trayek = document.getElementById('f-trayek').value;
-  const jumlah = parseInt(document.getElementById('f-jumlah').value, 10);
+    async function persistEntry(entry) {
+      if (usingApi) {
+        await fetch(API_URL, {
+          method: 'POST',
+          // Content-Type text/plain sengaja dipakai supaya browser tidak mengirim
+          // preflight OPTIONS, karena Apps Script Web App tidak menanganinya.
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(entry)
+        });
+      } else {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      }
+    }
 
-  if (!jam || !po || !asal || !tujuan || !jenis || !trayek || isNaN(jumlah) || jumlah < 0) return;
+    function showApiWarning() {
+      const banner = document.getElementById('api-warning');
+      if (banner) banner.style.display = 'block';
+    }
 
-  const now = new Date();
-  const entry = {
-    id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
-    tanggal: now.toISOString().slice(0, 10),
-    jam,
-    plat,
-    po,
-    asal,
-    tujuan,
-    jenis,
-    trayek,
-    jumlah,
-    createdAt: now.toISOString()
-  };
+    // ---------- form submit ----------
+    document.getElementById('entry-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const jam = document.getElementById('f-jam').value;
+      const plat = document.getElementById('f-plat').value.trim();
+      const po = document.getElementById('f-po').value.trim();
+      const asal = document.getElementById('f-asal').value.trim();
+      const tujuan = document.getElementById('f-tujuan').value.trim();
+      const jenis = document.getElementById('f-jenis').value;
+      const trayek = document.getElementById('f-trayek').value;
+      const jumlah = parseInt(document.getElementById('f-jumlah').value, 10);
 
-  entries.push(entry);
-  try {
-    await persistEntry(entry);
-  } catch (err) {
-    console.error('Gagal menyimpan ke Apps Script', err);
-    alert('Gagal menyimpan data. Cek koneksi atau URL Apps Script.');
-  }
+      if (!jam || !po || !asal || !tujuan || !jenis || !trayek || isNaN(jumlah) || jumlah < 0) return;
 
-  document.getElementById('entry-form').reset();
-  const toast = document.getElementById('toast');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2200);
+      const now = new Date();
+      const entry = {
+        id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+        tanggal: now.toISOString().slice(0, 10),
+        jam,
+        plat,
+        po,
+        asal,
+        tujuan,
+        jenis,
+        trayek,
+        jumlah,
+        createdAt: now.toISOString()
+      };
 
-  renderRecent();
-  renderDashboard();
-});
+      entries.push(entry);
+      try {
+        await persistEntry(entry);
+      } catch (err) {
+        console.error('Gagal menyimpan ke Apps Script', err);
+        alert('Gagal menyimpan data. Cek koneksi atau URL Apps Script.');
+      }
 
-// ---------- recent list on input tab ----------
-function renderRecent() {
-  const wrap = document.getElementById('recent-list');
-  const last = [...entries].sort((a,b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 6);
-  if (last.length === 0) {
-    wrap.innerHTML = '<div class="stub-empty">Belum ada catatan hari ini.</div>';
-    return;
-  }
-  wrap.innerHTML = last.map(en => `
+      document.getElementById('entry-form').reset();
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+
+      renderRecent();
+      renderDashboard();
+    });
+
+    // ---------- recent list on input tab ----------
+    function renderRecent() {
+      const wrap = document.getElementById('recent-list');
+      const last = [...entries].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 6);
+      if (last.length === 0) {
+        wrap.innerHTML = '<div class="stub-empty">Belum ada catatan hari ini.</div>';
+        return;
+      }
+      wrap.innerHTML = last.map(en => `
     <div class="stub">
       <div>
         <div class="stub-route">${escapeHtml(en.po)} <span style="font-weight:normal; font-size:12.5px; color:var(--text-soft)">(${escapeHtml(en.jenis || 'Kedatangan')} - ${escapeHtml(en.trayek || 'AKAP')})</span></div>
@@ -809,140 +1015,140 @@ function renderRecent() {
       <div class="stub-count">${en.jumlah}<span>pnp</span></div>
     </div>
   `).join('');
-}
-
-// ---------- dashboard ----------
-document.getElementById('d-tanggal').addEventListener('change', renderDashboard);
-document.getElementById('d-reset').addEventListener('click', () => {
-  document.getElementById('d-tanggal').value = '';
-  renderDashboard();
-});
-
-// ---------- export PDF ----------
-document.getElementById('export-pdf').addEventListener('click', () => {
-  const data = [...getFilteredEntries()].sort((a,b) => a.createdAt.localeCompare(b.createdAt));
-
-  if (data.length === 0) {
-    alert('Tidak ada data untuk diunduh pada tanggal yang dipilih.');
-    return;
-  }
-
-  const dateFilter = document.getElementById('d-tanggal').value;
-  const totalPenumpang = data.reduce((s, e) => s + e.jumlah, 0);
-  const totalBus = data.length;
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
-
-  // header
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(15);
-  doc.setTextColor('#171a1f');
-  doc.text('SIMONA — Rekap Kedatangan Bus', 40, 46);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-  doc.setTextColor('#736b5c');
-  const periode = dateFilter
-    ? 'Periode: ' + formatTanggalIndo(dateFilter)
-    : 'Periode: seluruh data tercatat';
-  doc.text(periode, 40, 63);
-  doc.text('Dicetak: ' + new Date().toLocaleString('id-ID'), 40, 77);
-
-  // summary line
-  doc.setFontSize(10.5);
-  doc.setTextColor('#23262c');
-  doc.text(`Total penumpang: ${totalPenumpang.toLocaleString('id-ID')}      Jumlah bus: ${totalBus}      Rata-rata/bus: ${Math.round(totalPenumpang/totalBus)}`, 40, 96);
-
-  // table
-  const head = [['Tanggal', 'Jam', 'PO', 'Jenis', 'Trayek', 'Rute', 'Plat', 'Penumpang']];
-  const body = data.map(e => {
-    let tgl = e.tanggal || '';
-    if (typeof tgl === 'string' && tgl.includes('T')) tgl = tgl.split('T')[0];
-    let jm = e.jam || '';
-    if (typeof jm === 'string' && jm.includes('T')) {
-      const d = new Date(jm);
-      jm = String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0');
     }
-    return [
-      tgl, jm, e.po, e.jenis || 'Kedatangan', e.trayek || 'AKAP', `${e.asal} - ${e.tujuan}`, e.plat || '–', String(e.jumlah)
-    ];
-  });
-  body.push(['', '', '', '', '', '', 'TOTAL', String(totalPenumpang)]);
 
-  doc.autoTable({
-    head,
-    body,
-    startY: 112,
-    styles: { font: 'helvetica', fontSize: 9, cellPadding: 6, textColor: '#23262c' },
-    headStyles: { fillColor: [23, 26, 31], textColor: [239, 231, 214], fontStyle: 'bold' },
-    alternateRowStyles: { fillColor: [251, 247, 238] },
-    columnStyles: { 7: { halign: 'right', fontStyle: 'bold', textColor: [187, 75, 40] } },
-    didParseCell: (hookData) => {
-      if (hookData.row.index === body.length - 1 && hookData.section === 'body') {
-        hookData.cell.styles.fontStyle = 'bold';
-        hookData.cell.styles.fillColor = [244, 227, 218];
+    // ---------- dashboard ----------
+    document.getElementById('d-tanggal').addEventListener('change', renderDashboard);
+    document.getElementById('d-reset').addEventListener('click', () => {
+      document.getElementById('d-tanggal').value = '';
+      renderDashboard();
+    });
+
+    // ---------- export PDF ----------
+    document.getElementById('export-pdf').addEventListener('click', () => {
+      const data = [...getFilteredEntries()].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+
+      if (data.length === 0) {
+        alert('Tidak ada data untuk diunduh pada tanggal yang dipilih.');
+        return;
       }
+
+      const dateFilter = document.getElementById('d-tanggal').value;
+      const totalPenumpang = data.reduce((s, e) => s + e.jumlah, 0);
+      const totalBus = data.length;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+
+      // header
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(15);
+      doc.setTextColor('#171a1f');
+      doc.text('SIMONA — Rekap Kedatangan Bus', 40, 46);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor('#736b5c');
+      const periode = dateFilter
+        ? 'Periode: ' + formatTanggalIndo(dateFilter)
+        : 'Periode: seluruh data tercatat';
+      doc.text(periode, 40, 63);
+      doc.text('Dicetak: ' + new Date().toLocaleString('id-ID'), 40, 77);
+
+      // summary line
+      doc.setFontSize(10.5);
+      doc.setTextColor('#23262c');
+      doc.text(`Total penumpang: ${totalPenumpang.toLocaleString('id-ID')}      Jumlah bus: ${totalBus}      Rata-rata/bus: ${Math.round(totalPenumpang / totalBus)}`, 40, 96);
+
+      // table
+      const head = [['Tanggal', 'Jam', 'PO', 'Jenis', 'Trayek', 'Rute', 'Plat', 'Penumpang']];
+      const body = data.map(e => {
+        let tgl = e.tanggal || '';
+        if (typeof tgl === 'string' && tgl.includes('T')) tgl = tgl.split('T')[0];
+        let jm = e.jam || '';
+        if (typeof jm === 'string' && jm.includes('T')) {
+          const d = new Date(jm);
+          jm = String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0');
+        }
+        return [
+          tgl, jm, e.po, e.jenis || 'Kedatangan', e.trayek || 'AKAP', `${e.asal} - ${e.tujuan}`, e.plat || '–', String(e.jumlah)
+        ];
+      });
+      body.push(['', '', '', '', '', '', 'TOTAL', String(totalPenumpang)]);
+
+      doc.autoTable({
+        head,
+        body,
+        startY: 112,
+        styles: { font: 'helvetica', fontSize: 9, cellPadding: 6, textColor: '#23262c' },
+        headStyles: { fillColor: [23, 26, 31], textColor: [239, 231, 214], fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [251, 247, 238] },
+        columnStyles: { 7: { halign: 'right', fontStyle: 'bold', textColor: [187, 75, 40] } },
+        didParseCell: (hookData) => {
+          if (hookData.row.index === body.length - 1 && hookData.section === 'body') {
+            hookData.cell.styles.fontStyle = 'bold';
+            hookData.cell.styles.fillColor = [244, 227, 218];
+          }
+        }
+      });
+
+      const filename = 'simona-penumpang-' + (dateFilter || 'semua-data') + '.pdf';
+      doc.save(filename);
+    });
+
+    function formatTanggalIndo(isoDate) {
+      const d = new Date(isoDate + 'T00:00:00');
+      return d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     }
-  });
 
-  const filename = 'simona-penumpang-' + (dateFilter || 'semua-data') + '.pdf';
-  doc.save(filename);
-});
+    function getFilteredEntries() {
+      const dateFilter = document.getElementById('d-tanggal').value;
+      if (!dateFilter) return entries;
+      return entries.filter(e => e.tanggal === dateFilter);
+    }
 
-function formatTanggalIndo(isoDate) {
-  const d = new Date(isoDate + 'T00:00:00');
-  return d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-}
+    function renderDashboard() {
+      const data = getFilteredEntries();
+      const totalPenumpang = data.reduce((s, e) => s + e.jumlah, 0);
+      const totalBus = data.length;
+      const avg = totalBus ? Math.round(totalPenumpang / totalBus) : 0;
 
-function getFilteredEntries() {
-  const dateFilter = document.getElementById('d-tanggal').value;
-  if (!dateFilter) return entries;
-  return entries.filter(e => e.tanggal === dateFilter);
-}
+      document.getElementById('s-total').textContent = totalPenumpang.toLocaleString('id-ID');
+      document.getElementById('s-bus').textContent = totalBus.toLocaleString('id-ID');
+      document.getElementById('s-avg').textContent = avg.toLocaleString('id-ID');
 
-function renderDashboard() {
-  const data = getFilteredEntries();
-  const totalPenumpang = data.reduce((s, e) => s + e.jumlah, 0);
-  const totalBus = data.length;
-  const avg = totalBus ? Math.round(totalPenumpang / totalBus) : 0;
+      const filterActive = !!document.getElementById('d-tanggal').value;
+      document.getElementById('s-total-sub').textContent = filterActive ? 'pada tanggal terpilih' : 'seluruh data tercatat';
+      document.getElementById('s-bus-sub').textContent = filterActive ? 'kedatangan pada tanggal ini' : 'kedatangan tercatat';
 
-  document.getElementById('s-total').textContent = totalPenumpang.toLocaleString('id-ID');
-  document.getElementById('s-bus').textContent = totalBus.toLocaleString('id-ID');
-  document.getElementById('s-avg').textContent = avg.toLocaleString('id-ID');
+      const hourly = {};
+      data.forEach(e => {
+        const h = e.jam ? e.jam.slice(0, 2) + ':00' : '??';
+        hourly[h] = (hourly[h] || 0) + e.jumlah;
+      });
+      const hourLabels = Object.keys(hourly).sort();
+      const hourValues = hourLabels.map(h => hourly[h]);
 
-  const filterActive = !!document.getElementById('d-tanggal').value;
-  document.getElementById('s-total-sub').textContent = filterActive ? 'pada tanggal terpilih' : 'seluruh data tercatat';
-  document.getElementById('s-bus-sub').textContent = filterActive ? 'kedatangan pada tanggal ini' : 'kedatangan tercatat';
+      let peakLabel = '–', peakVal = 0;
+      hourLabels.forEach(h => { if (hourly[h] > peakVal) { peakVal = hourly[h]; peakLabel = h; } });
+      document.getElementById('s-peak').textContent = peakLabel;
+      document.getElementById('s-peak-sub').textContent = peakVal ? peakVal + ' penumpang pada jam itu' : '\u00A0';
 
-  const hourly = {};
-  data.forEach(e => {
-    const h = e.jam ? e.jam.slice(0,2) + ':00' : '??';
-    hourly[h] = (hourly[h] || 0) + e.jumlah;
-  });
-  const hourLabels = Object.keys(hourly).sort();
-  const hourValues = hourLabels.map(h => hourly[h]);
+      const poAgg = {};
+      data.forEach(e => { poAgg[e.po] = (poAgg[e.po] || 0) + e.jumlah; });
+      const poEntries = Object.entries(poAgg).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
-  let peakLabel = '–', peakVal = 0;
-  hourLabels.forEach(h => { if (hourly[h] > peakVal) { peakVal = hourly[h]; peakLabel = h; } });
-  document.getElementById('s-peak').textContent = peakLabel;
-  document.getElementById('s-peak-sub').textContent = peakVal ? peakVal + ' penumpang pada jam itu' : '\u00A0';
+      drawHourlyChart(hourLabels, hourValues);
+      drawPoChart(poEntries.map(p => p[0]), poEntries.map(p => p[1]));
 
-  const poAgg = {};
-  data.forEach(e => { poAgg[e.po] = (poAgg[e.po] || 0) + e.jumlah; });
-  const poEntries = Object.entries(poAgg).sort((a,b) => b[1]-a[1]).slice(0, 8);
-
-  drawHourlyChart(hourLabels, hourValues);
-  drawPoChart(poEntries.map(p=>p[0]), poEntries.map(p=>p[1]));
-
-  const tbody = document.getElementById('history-body');
-  const sorted = [...data].sort((a,b) => b.createdAt.localeCompare(a.createdAt));
-  if (sorted.length === 0) {
-    tbody.innerHTML = '';
-    document.getElementById('empty-state').style.display = 'block';
-  } else {
-    document.getElementById('empty-state').style.display = 'none';
-    tbody.innerHTML = sorted.map(e => `
+      const tbody = document.getElementById('history-body');
+      const sorted = [...data].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      if (sorted.length === 0) {
+        tbody.innerHTML = '';
+        document.getElementById('empty-state').style.display = 'block';
+      } else {
+        document.getElementById('empty-state').style.display = 'none';
+        tbody.innerHTML = sorted.map(e => `
       <tr>
         <td>${e.jam}</td>
         <td>${escapeHtml(e.po)}</td>
@@ -953,70 +1159,71 @@ function renderDashboard() {
         <td class="tnum">${e.jumlah}</td>
       </tr>
     `).join('');
-  }
-}
-
-function drawHourlyChart(labels, values) {
-  const ctx = document.getElementById('chart-hourly');
-  if (hourlyChart) hourlyChart.destroy();
-  hourlyChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels.length ? labels : ['–'],
-      datasets: [{
-        data: values.length ? values : [0],
-        backgroundColor: '#bb4b28',
-        borderRadius: 3,
-        maxBarThickness: 34
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { beginAtZero: true, ticks: { font: { family: 'Space Grotesk', size: 11 } }, grid: { color: '#e5dcc6' } },
-        x: { ticks: { font: { family: 'Space Grotesk', size: 11 } }, grid: { display: false } }
       }
     }
-  });
-}
 
-function drawPoChart(labels, values) {
-  const ctx = document.getElementById('chart-po');
-  if (poChart) poChart.destroy();
-  poChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels.length ? labels : ['–'],
-      datasets: [{
-        data: values.length ? values : [0],
-        backgroundColor: '#1f6f64',
-        borderRadius: 3,
-        maxBarThickness: 26
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { beginAtZero: true, ticks: { font: { family: 'Space Grotesk', size: 11 } }, grid: { color: '#e5dcc6' } },
-        y: { ticks: { font: { family: 'Work Sans', size: 11.5 } }, grid: { display: false } }
-      }
+    function drawHourlyChart(labels, values) {
+      const ctx = document.getElementById('chart-hourly');
+      if (hourlyChart) hourlyChart.destroy();
+      hourlyChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels.length ? labels : ['–'],
+          datasets: [{
+            data: values.length ? values : [0],
+            backgroundColor: '#bb4b28',
+            borderRadius: 3,
+            maxBarThickness: 34
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { font: { family: 'Space Grotesk', size: 11 } }, grid: { color: '#e5dcc6' } },
+            x: { ticks: { font: { family: 'Space Grotesk', size: 11 } }, grid: { display: false } }
+          }
+        }
+      });
     }
-  });
-}
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
+    function drawPoChart(labels, values) {
+      const ctx = document.getElementById('chart-po');
+      if (poChart) poChart.destroy();
+      poChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels.length ? labels : ['–'],
+          datasets: [{
+            data: values.length ? values : [0],
+            backgroundColor: '#1f6f64',
+            borderRadius: 3,
+            maxBarThickness: 26
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, ticks: { font: { family: 'Space Grotesk', size: 11 } }, grid: { color: '#e5dcc6' } },
+            y: { ticks: { font: { family: 'Work Sans', size: 11.5 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
 
-loadEntries();
-</script>
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    loadEntries();
+  </script>
 
 </body>
+
 </html>
